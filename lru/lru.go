@@ -65,13 +65,14 @@ func (c *Cache) ReMoveOldest() {
 	}
 }
 
-//新增/修改
+// 新增/修改
 func (c *Cache) Add(key string, value Value) {
 	if ele, ok := c.cache[key]; ok {
 		c.ll.MoveToFront(ele)
 		kv := ele.Value.(*entry)
 		//存在则修改亲爱
 		c.nbytes += int64(value.Len()) - int64(kv.value.Len())
+		kv.value = value
 	} else {
 		ele := c.ll.PushFront(&entry{key, value})
 		c.cache[key] = ele
