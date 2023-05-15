@@ -44,7 +44,8 @@ func (c *Cache) Get(key string) (value Value, ok bool) {
 		c.ll.MoveToFront(ele)
 		//这是一个类型断言
 		kv := ele.Value.(*entry)
-		//如果找到则返回这个值
+		//如果找
+		//到则返回这个值
 		return kv.value, true
 	}
 	return
