@@ -1,5 +1,5 @@
 // 用来表示缓存值
-package byteview
+package geecache
 
 type ByteView struct {
 	//为了支持任意数据类型存储 所以是byte
