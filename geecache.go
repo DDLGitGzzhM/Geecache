@@ -2,7 +2,8 @@
 package geecache
 
 import (
-	. "geecache/byteview"
+	"fmt"
+	"log"
 	"sync"
 )
 
@@ -68,13 +69,40 @@ func GetGroup(name string) *Group {
 	mu.RUnlock()
 	return g
 }
+func (g *Group) Get(key string) (ByteView, error) {
+	if key == "" {
+		//必然报错
+		return ByteView{}, fmt.Errorf("key is required")
+	}
+	//如果存在 则直接返回缓存中的值
+	if v, ok := g.mainCache.get(key); ok {
+		log.Println("[GeeCache] hit")
+		return v, nil
+	}
+	return g.load(key)
+}
+
+// 通过load 调用getLocally
+// 从其他节点获取,去找数据源
+func (g *Group) load(key string) (value ByteView, err error) {
+	return g.getLocally(key)
+}
 
 func (g *Group) getLocally(key string) (ByteView, error) {
-	bytes, err  := g.getter.Get(key)
+	//通过回调函数从数据源中获取数据
+	bytes, err := g.getter.Get(key)
 
 	if err != nil {
-		return ByteView{} , err
+		return ByteView{}, err
 	}
 
-	value := ByteView{b: }
+	//为了不对源数据做出影响
+	value := ByteView{b: cloneBytes(bytes)}
+	g.populateCache(key, value)
+	return value, nil
+}
+
+// 添加到缓存中
+func (g *Group) populateCache(key string, value ByteView) {
+	g.mainCache.add(key, value)
 }

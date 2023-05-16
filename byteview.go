@@ -19,6 +19,8 @@ func (v ByteView) String() string {
 func (v ByteView) ByteSlice() []byte {
 	return cloneBytes(v.b)
 }
+
+// 这个函数的意义在哪里
 func cloneBytes(b []byte) []byte {
 	c := make([]byte, len(b))
 	copy(c, b)
